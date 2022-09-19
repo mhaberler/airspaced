@@ -1,7 +1,9 @@
 # airspaced - a REST API to OpenAIP information
 
 airspaced provides a lat x lon lookup to applicable airspaces
+
 capable of offline operation
+
 runs off a local spatialite database
 
 example queries:
