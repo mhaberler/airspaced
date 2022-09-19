@@ -1,0 +1,13 @@
+[Unit]
+Description=Airspaced web app
+After=network.target
+
+[Service]
+User=mah
+WorkingDirectory=/home/mah/src/airspaced
+ExecStart=/home/mah/miniconda3/bin/uvicorn --port 1815 app:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+

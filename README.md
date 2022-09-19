@@ -6,17 +6,26 @@ runs off a local spatialite database
 
 example queries:
 
-curl -X 'GET'   http://127.0.0.1:1815/
-curl -X 'GET'   http://127.0.0.1:1815/v1/airspaces/47.1292371/15.2120164/7100
-curl -X 'GET'   http://127.0.0.1:1815/v1/airspaces/47.1292371/15.2120164
+https://cloud.mah.priv.at/v1/airspaces/47.1292371/15.2120164
+https://cloud.mah.priv.at/v1/airspaces/47.1292371/15.2120164/7100
 
+
+try how it looks:
+
+`curl -s  https://cloud.mah.priv.at/v1/airspaces/47.1292371/15.2120164/7100 >test.geojson`
+
+drag & drop test.geojson onto http://geojson.io
+
+![geojson.io](/img/screenshot.png?raw=true "geojson.io")
 
 ## API docs
 
-http://127.0.0.1:1815/docs
+https://cloud.mah.priv.at/docs
 
 ### OpenAPI description
-http://127.0.0.1:1815/openapi.json
+
+https://cloud.mah.priv.at/openapi.json
+
 
 ## requirements
 apt-get install sqlite3 libsqlite3-dev libsqlite3-mod-spatialite
