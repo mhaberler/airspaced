@@ -62,14 +62,18 @@ class Airspaces:
         )
         self.cursor.execute(query)
         data = self.cursor.fetchall()
-        queryprops = {
-            "name": "query",
-            "within": [],
-            "above": [],
-            "below": [],
-        }
+
+        if alt:
+            response = {
+                "within": {"type": "FeatureCollection", "features": []},
+                "above": {"type": "FeatureCollection", "features": []},
+                "below": {"type": "FeatureCollection", "features": []},
+            }
+        else:
+            response = {"applicable": {"type": "FeatureCollection", "features": []}}
+
         # create a new list which will store the single GeoJSON features
-        featureCollection = list()
+        #featureCollection = list()
 
         for row in data:
             # create a single GeoJSON geometry from the geometry column which already contains a GeoJSON string
@@ -81,35 +85,36 @@ class Airspaces:
             # create a new GeoJSON feature and pass the geometry columns as well as all remaining attributes which are stored in the row dictionary
             j = json.loads(row["properties"])
             props = fixup(j, self.schema)
+
+            asp = geojson.Feature(geometry=geom, properties=props, id=props["_id"])
+
+            # append the current feature to the list of all features
+            #featureCollection.append(asp)
+
             if alt:
                 (
                     above_lower_boundary,
                     below_upper_boundary,
                 ) = self.test_current_airspace(props, alt)
                 if above_lower_boundary and below_upper_boundary:
-                    queryprops["within"].append(props)
+                    response["within"]["features"].append(asp)
                 elif above_lower_boundary:
-                    queryprops["above"].append(props)
+                    response["above"]["features"].append(asp)
                 elif below_upper_boundary:
-                    queryprops["below"].append(props)
+                    response["below"]["features"].append(asp)
 
                 # print("lookup", alt, above_lower_boundary, below_upper_boundary, props["lowerLimit"], props["upperLimit"])
-            if shapes:
-                feature = geojson.Feature(geometry=geom, properties=props, id=props["_id"])
+            else:
+                response["applicable"]["features"].append(props)
 
-                # append the current feature to the list of all features
-                featureCollection.append(feature)
+        # add the query as point feature
+        # response["query"] = geojson.Feature(
+        #     geometry=geojson.Point((lon, lat, alt)),
+        #     id=uuid.uuid4(),
+        # )
 
-        if alt:
-            # add the query as point feature
-            loc = geojson.Feature(
-                geometry=geojson.Point((lon, lat, alt)),
-                properties=queryprops,
-                id=uuid.uuid4(),
-            )
-            featureCollection.append(loc)
-
-        return {"type": "FeatureCollection", "features": featureCollection}
+        #return {"type": "FeatureCollection", "features": featureCollection}
+        return  response
 
     def within_airspace(self, altitude_ft, upper, upper_unit, lower, lower_unit):
         fl = int(altitude_ft / 100)
